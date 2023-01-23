@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 import statusModel from '../schema/statusSchema.js';
-import availablecycleById from './helperFunctions/availableCycle.js';
+import helperFunction from './helperFunctions/availableCycle.js';
 
 
 //Link with mongodb server using mongoose
@@ -12,18 +12,19 @@ async function main() {
 
 
 
-//req object : {userId:, dealerId:, cycleStoreId:, cycleId:}
+//req object : {userId:, dealerId:, cycleStoreId:, cycleId:, rate:}
 
 async function bookCycle(req,res){
 
-
-    if(await availablecycleById(req.dealerId, req.cycleStoreId, req.cycleId)<=0){
+    const x = await helperFunction.availableCycleById(req.body.dealerId, req.body.cycleStoreId, req.body.cycleId);
+    
+    if(x<=0){
 
       return res.status(400).json({'msg':`Cycle not available`});
 
     }
 
-    const check = await statusModel.count({userId:req.userId,$or:[{status:1},{status:2}]});
+    const check = await statusModel.count({userId:req.body.userId,$or:[{status:1},{status:2}]});
 
     if(check!==0){
 
@@ -32,10 +33,11 @@ async function bookCycle(req,res){
     }
 
 
-    await statusModel.insertMany([{userId: req.userId,
-                          dealerId: req.dealerId,
-                          cycleStoreId: req.cycleStoreId,
-                          cycleId: req.cycleId,
+    await statusModel.insertMany([{userId: req.body.userId,
+                          dealerId: req.body.dealerId,
+                          cycleStoreId: req.body.cycleStoreId,
+                          rate: req.body.rate,
+                          cycleId: req.body.cycleId,
                           timeStart: new Date(),
                           status: 1
     }]);

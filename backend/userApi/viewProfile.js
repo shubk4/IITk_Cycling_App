@@ -15,10 +15,8 @@ async function main() {
 //Returns an object of form userSchema
 async function viewProfileUser(req,res){
 
-    console.log(req.body);
-    const userData = await userModel.findOne({_id: req.body.userId});
-    // const userData = await userModel.findOne({email: req.body.email});
-
+    const userData = await userModel.findOne({userId: req.body.userId});
+    console.log(userData);
     return res.status(200).json(userData);
 
 }
